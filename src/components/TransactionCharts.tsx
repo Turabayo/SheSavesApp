@@ -1,0 +1,144 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useChartData } from "@/hooks/useChartData";
+import { Loader2 } from "lucide-react";
+
+export const TransactionCharts = () => {
+  const { dailyVolumeData, transactionAmountData, transactionTypeData, agentPerformanceData, isLoading } = useChartData();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 md:space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Financial Dashboard</h1>
+        <p className="text-muted-foreground">Real-time analytics and insights</p>
+      </div>
+
+      {/* Daily Transaction Volume Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Daily Transaction Volume</CardTitle>
+          <p className="text-sm text-muted-foreground">Transactions Over Time</p>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300} className="md:h-96">
+            <LineChart data={dailyVolumeData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis dataKey="date" className="text-xs" />
+              <YAxis className="text-xs" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))', 
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }} 
+              />
+              <Legend />
+              <Line type="monotone" dataKey="topup" stroke="hsl(var(--chart-1))" strokeWidth={2} name="Top-ups" />
+              <Line type="monotone" dataKey="withdrawal" stroke="hsl(var(--chart-2))" strokeWidth={2} name="Withdrawals" />
+              <Line type="monotone" dataKey="transfer" stroke="hsl(var(--chart-3))" strokeWidth={2} name="Transfers" />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Daily Transaction Amount */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Daily Transaction Amount</CardTitle>
+          <p className="text-sm text-muted-foreground">Transaction Amount Over Time</p>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={280} className="md:h-80">
+            <BarChart data={transactionAmountData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis dataKey="month" className="text-xs" />
+              <YAxis className="text-xs" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))', 
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }} 
+                formatter={(value) => [`RWF ${Number(value).toLocaleString()}`, 'Amount']}
+              />
+              <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Transaction Types Pie Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Transaction Types</CardTitle>
+            <p className="text-sm text-muted-foreground">Distribution by Category</p>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250} className="md:h-72">
+              <PieChart>
+                <Pie
+                  data={transactionTypeData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={60}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {transactionTypeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }} 
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Agent Performance */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Agents by Performance</CardTitle>
+            <p className="text-sm text-muted-foreground">Agent Performance Metrics</p>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250} className="md:h-72">
+              <BarChart data={agentPerformanceData} layout="horizontal">
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis type="number" className="text-xs" />
+                <YAxis dataKey="name" type="category" className="text-xs" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }} 
+                />
+                <Legend />
+                <Bar dataKey="withdrawals" fill="hsl(var(--chart-1))" name="Withdrawals" />
+                <Bar dataKey="deposits" fill="hsl(var(--chart-2))" name="Deposits" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
