@@ -26,6 +26,6 @@ This project is built with:
 
 # Designs & Media
 
-  **Prototype in Figma**: [View Design](https://www.figma.com/design/n6EvDJ2L01yGxoGDziKWeU/SheSaves?node-id=0-1&t=znaneEMsrEStqWMn-1)
+  **SheSaves Screenshots in Figma**: https://www.figma.com/board/qbIBL5TUoQ1g1lsr7fHMI4/Untitled?node-id=0-1&t=6Xxjo0t3jPOpcuKg-1
   **Video Demo**: [Watch on Google Drive](https://drive.google.com/drive/folders/1dgSdX9dzE9nuor5y4m4ykxwaCnhxH0iG?usp=sharing)
   **Deployment Link**: 
