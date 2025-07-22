@@ -20,12 +20,11 @@ This project is built with:
 
 - React
 - TypeScript
-- React
 - shadcn-ui
 - Tailwind CSS
 
 # Designs & Media
 
   **SheSaves Screenshots in Figma**: https://www.figma.com/board/qbIBL5TUoQ1g1lsr7fHMI4/Untitled?node-id=0-1&t=6Xxjo0t3jPOpcuKg-1
-  **Video Demo**: [Watch on Google Drive](https://drive.google.com/drive/folders/1dgSdX9dzE9nuor5y4m4ykxwaCnhxH0iG?usp=sharing)
+  **Video Demo**: [Watch on Youtube](https://youtu.be/yn0ihXI6L1I)
   **Deployment Link**: 
