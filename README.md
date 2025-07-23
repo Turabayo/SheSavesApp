@@ -14,9 +14,9 @@ npm i
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-## What technologies are used for this project?
+## What technologies are used for SheSaves?
 
-This project is built with:
+SheSaves is built with:
 
 - React
 - TypeScript
