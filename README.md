@@ -27,4 +27,4 @@ SheSaves is built with:
 
   **SheSaves Screenshots in Figma**: https://www.figma.com/board/qbIBL5TUoQ1g1lsr7fHMI4/Untitled?node-id=0-1&t=6Xxjo0t3jPOpcuKg-1
 
-  **Video Demo**: [Watch on Youtube](https://youtu.be/yn0ihXI6L1I)
+  **Video Demo**: [Watch on Youtube](https://youtu.be/1GsUmpJ2f90)

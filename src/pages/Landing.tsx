@@ -66,9 +66,8 @@ const Landing = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"> Women</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Save smart, invest wisely, and build your financial future with SheSaves. 
-              Track savings goals, make secure mobile payments, and get instant SMS notifications 
-              for all your transactions. Start your journey to financial independence today.
+              Save smart, invest wisely, Build your financial future with SheSaves and 
+              Track savings goals. Start your journey to financial independence today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center gap-y-6">
               <Button 
