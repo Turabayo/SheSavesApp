@@ -15,7 +15,6 @@ export const useChartData = () => {
         .from("transactions")
         .select("*")
         .eq("user_id", user.id)
-        .eq("status", "success") // Only successful transactions
         .order("created_at", { ascending: true });
       
       if (error) throw error;
@@ -33,7 +32,7 @@ export const useChartData = () => {
         .from("topups")
         .select("*")
         .eq("user_id", user.id)
-        .eq("status", "SUCCESSFUL") // Only successful topups
+        // Remove status filter to show all topups including failed ones
         .order("created_at", { ascending: true });
       
       if (error) throw error;
@@ -51,7 +50,7 @@ export const useChartData = () => {
         .from("withdrawals")
         .select("*")
         .eq("user_id", user.id)
-        .eq("status", "completed") // Only completed withdrawals
+        // Remove status filter to show all withdrawals including failed ones
         .order("created_at", { ascending: true });
       
       if (error) throw error;
@@ -69,7 +68,6 @@ export const useChartData = () => {
         .from("savings")
         .select("*")
         .eq("user_id", user.id)
-        .eq("status", "success") // Only successful savings
         .order("created_at", { ascending: true });
       
       if (error) throw error;
@@ -78,24 +76,52 @@ export const useChartData = () => {
     enabled: !!user?.id,
   });
 
-  // Process data for charts - only count successful transactions
-  const dailyVolumeData = transactionData.reduce((acc: any[], transaction) => {
-    const date = new Date(transaction.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    const existingEntry = acc.find(entry => entry.date === date);
+  // Process data for charts - combine topups and withdrawals by date with real data
+  const dailyVolumeData = () => {
+    const dateMap = new Map();
     
-    if (existingEntry) {
-      existingEntry[transaction.type] = (existingEntry[transaction.type] || 0) + 1;
-    } else {
-      acc.push({
-        date,
-        [transaction.type]: 1,
-        topup: 0,
-        withdrawal: 0,
-        transfer: 0
+    // Process topups - use actual amounts from database
+    topupData.forEach(topup => {
+      const date = new Date(topup.created_at);
+      const dateKey = date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
       });
-    }
-    return acc;
-  }, []);
+      const existing = dateMap.get(dateKey) || { 
+        date: dateKey, 
+        topups: 0, 
+        withdrawals: 0,
+        sortDate: date
+      };
+      existing.topups += Number(topup.amount) || 0;
+      dateMap.set(dateKey, existing);
+    });
+    
+    // Process withdrawals - use actual amounts from database
+    withdrawalData.forEach(withdrawal => {
+      const date = new Date(withdrawal.created_at);
+      const dateKey = date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+      const existing = dateMap.get(dateKey) || { 
+        date: dateKey, 
+        topups: 0, 
+        withdrawals: 0,
+        sortDate: date
+      };
+      existing.withdrawals += Number(withdrawal.amount) || 0;
+      dateMap.set(dateKey, existing);
+    });
+    
+    // Sort by actual date and return only the last 30 days for better visualization
+    return Array.from(dateMap.values())
+      .sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime())
+      .slice(-30) // Show last 30 days
+      .map(({ sortDate, ...rest }) => rest); // Remove sortDate from final result
+  };
 
   const transactionAmountData = [...transactionData, ...topupData, ...withdrawalData].reduce((acc: any[], item) => {
     const month = new Date(item.created_at).toLocaleDateString('en-US', { month: 'short' });
@@ -110,7 +136,7 @@ export const useChartData = () => {
     return acc;
   }, []);
 
-  // Only count successful transactions in the pie chart
+  // Only count successful transactions in the pie chart - remove transfers
   const transactionTypeData = [
     { 
       name: "Top-ups", 
@@ -119,20 +145,15 @@ export const useChartData = () => {
     },
     { 
       name: "Withdrawals", 
-      value: withdrawalData.length, // Now only successful withdrawals
+      value: withdrawalData.length,
       color: "hsl(var(--chart-2))" 
     },
     { 
       name: "Savings", 
       value: savingsData.length, 
       color: "hsl(var(--chart-3))" 
-    },
-    { 
-      name: "Transactions", 
-      value: transactionData.length, 
-      color: "hsl(var(--chart-4))" 
     }
-  ];
+  ].filter(item => item.value > 0); // Only show categories with data
 
   // Agent performance data (using user data as proxy) - only successful transactions
   const agentPerformanceData = [
@@ -149,10 +170,9 @@ export const useChartData = () => {
   ];
 
   return {
-    dailyVolumeData,
+    dailyVolumeData: dailyVolumeData(),
     transactionAmountData,
     transactionTypeData,
-    agentPerformanceData,
     isLoading: transactionsLoading || topupsLoading || withdrawalsLoading || savingsLoading
   };
 };

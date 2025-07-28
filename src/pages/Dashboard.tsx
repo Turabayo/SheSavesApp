@@ -8,6 +8,7 @@ import Navigation from "@/components/Navigation";
 import { useSavings } from "@/hooks/useSavings";
 import { useTopUps } from "@/hooks/useTopUps";
 import { useWithdrawals } from "@/hooks/useWithdrawals";
+import { useTransactionInsights } from "@/hooks/useTransactionInsights";
 import { formatCurrency, formatDate } from "@/utils/dateFormatter";
 import FloatingAIButton from "@/components/FloatingAIButton";
 import TransactionHistory from "@/components/TransactionHistory";
@@ -16,13 +17,15 @@ import { WithdrawDialog } from "@/components/WithdrawDialog";
 import { WithdrawalHistory } from "@/components/WithdrawalHistory";
 import { useToast } from "@/hooks/use-toast";
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { savings } = useSavings();
   
-  const { topUps, loading: topUpsLoading, getTotalSavings, getMonthlyAverage } = useTopUps();
+  const { topUps, loading: topUpsLoading } = useTopUps();
   const { loading: withdrawalsLoading } = useWithdrawals();
+  const { insights, loading: insightsLoading } = useTransactionInsights();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,7 +42,7 @@ const Dashboard = () => {
     }
   }, []);
 
-  if (authLoading || topUpsLoading || withdrawalsLoading) {
+  if (authLoading || topUpsLoading || withdrawalsLoading || insightsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -52,8 +55,9 @@ const Dashboard = () => {
 
   if (!user) return null;
 
-  const totalSavings = getTotalSavings();
-  const monthlyAverage = getMonthlyAverage();
+  // Use insights data for more accurate calculations
+  const totalSavings = insights?.savingsGrowth || 0;
+  const monthlyAverage = insights?.monthlyAverage || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,6 +74,7 @@ const Dashboard = () => {
               </h1>
               <p className="text-muted-foreground">Here's your financial overview</p>
             </div>
+
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -179,6 +184,7 @@ const Dashboard = () => {
             </h1>
             <p className="text-lg text-muted-foreground">Here's your complete financial dashboard</p>
           </div>
+
 
           {/* Stats Cards Row */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
